@@ -49,6 +49,6 @@ Join the fun here: [Guess The Prompt](https://t.me/+IVgUJhdx7gplN2Q0)
 * ⚡ [uv](https://docs.astral.sh/uv/getting-started/installation/) (uv will automatically manage your Python installation!)
 
 ### ⚙️ Setup
-1. **Clone the repository and run**
+   **Clone the repository and run**
    ```bash
    uv run bot.py
