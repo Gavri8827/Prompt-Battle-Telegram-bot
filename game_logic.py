@@ -115,6 +115,7 @@ def end_lobby(bot):
 
     with game_lock:
         game_state["guess_message_id"] = sent.message_id
+        game_state["challenge_image_file_id"] = sent.photo[-1].file_id
 
     logger.info(f"Guess countdown started ({config.GUESS_DURATION}s, tick={config.GUESS_TICK}s)")
     threading.Thread(target=guess_countdown, args=(bot,)).start()
@@ -133,10 +134,12 @@ def guess_countdown(bot):
             group_id = game_state["group_id"]
             message_id = game_state["guess_message_id"]
             guess_count = len(game_state["guesses"])
+            dm_messages = dict(game_state["dm_challenge_messages"])
 
         markup = InlineKeyboardMarkup()
         markup.add(InlineKeyboardButton("✍️ Submit Guess Privately", url=deep_link))
 
+        # Update group caption
         try:
             bot.edit_message_caption(
                 caption="🖼 *Describe this image!*\n\n"
@@ -150,6 +153,19 @@ def guess_countdown(bot):
         except Exception as e:
             if "message is not modified" not in str(e):
                 logger.warning(f"Guess edit error: {e}")
+
+        # Update DM captions with live timer
+        for uid, dm_info in dm_messages.items():
+            try:
+                bot.edit_message_caption(
+                    caption=f"🖼 *Describe this image!*\n\n⏱ Time remaining: {remaining}s",
+                    chat_id=dm_info["chat_id"],
+                    message_id=dm_info["message_id"],
+                    parse_mode="Markdown",
+                )
+            except Exception as e:
+                if "message is not modified" not in str(e):
+                    logger.warning(f"DM timer edit error for user {uid}: {e}")
 
         if remaining == 0:
             break

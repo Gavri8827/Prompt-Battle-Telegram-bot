@@ -17,6 +17,8 @@ game_state = {
     "guess_message_id": None,
     "guess_end_time": None,
     "challenge_image_id": None,
+    "challenge_image_file_id": None,
+    "dm_challenge_messages": {},  # {user_id: {"chat_id": ..., "message_id": ...}}
     "lobby_end_time": None,
     "evaluation_results": {},  # {user_id: {"score": ..., "image_bytes": ...}}
 }
@@ -34,6 +36,8 @@ def _reset_game_state():
         "guess_message_id": None,
         "guess_end_time": None,
         "challenge_image_id": None,
+        "challenge_image_file_id": None,
+        "dm_challenge_messages": {},
         "lobby_end_time": None,
         "evaluation_results": {},
     })

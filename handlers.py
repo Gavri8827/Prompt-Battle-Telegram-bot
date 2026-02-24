@@ -93,9 +93,30 @@ def register_handlers(bot):
                 return
 
             game_state["waiting_for_guess"].add(user_id)
+            file_id = game_state.get("challenge_image_file_id")
+            remaining = max(0, math.ceil(game_state["guess_end_time"] - time.time()))
 
         logger.info(f"  Waiting for guess prompt from user {user_id}")
-        bot.reply_to(message, "✍️ Please send me your image prompt now.")
+
+        # Send challenge image and timer in DM
+        if file_id:
+            try:
+                sent_dm = bot.send_photo(
+                    message.chat.id,
+                    photo=file_id,
+                    caption=f"🖼 *Describe this image!*\n\n⏱ Time remaining: {remaining}s",
+                    parse_mode="Markdown",
+                )
+                # Track this DM message so the countdown loop can update it
+                with game_lock:
+                    game_state["dm_challenge_messages"][user_id] = {
+                        "chat_id": message.chat.id,
+                        "message_id": sent_dm.message_id,
+                    }
+            except Exception as e:
+                logger.warning(f"Failed to send challenge image in DM: {e}")
+
+        bot.send_message(message.chat.id, "✍️ Send me your prompt now.")
 
     # =============================
     # /start_game
