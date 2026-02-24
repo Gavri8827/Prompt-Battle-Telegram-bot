@@ -1,0 +1,43 @@
+"""
+Game state management.
+Holds the shared game state dictionary, lock, and reset function.
+"""
+
+import threading
+
+game_lock = threading.Lock()
+
+game_state = {
+    "status": "IDLE",  # IDLE | LOBBY | GUESSING
+    "group_id": None,
+    "players": set(),
+    "guesses": {},
+    "waiting_for_guess": set(),
+    "lobby_message_id": None,
+    "guess_message_id": None,
+    "guess_end_time": None,
+    "challenge_image_id": None,
+    "lobby_end_time": None,
+}
+
+
+def _reset_game_state():
+    """Reset game state. Caller MUST already hold game_lock."""
+    game_state.update({
+        "status": "IDLE",
+        "group_id": None,
+        "players": set(),
+        "guesses": {},
+        "waiting_for_guess": set(),
+        "lobby_message_id": None,
+        "guess_message_id": None,
+        "guess_end_time": None,
+        "challenge_image_id": None,
+        "lobby_end_time": None,
+    })
+
+
+def reset_game():
+    """Reset the game state back to IDLE (acquires lock)."""
+    with game_lock:
+        _reset_game_state()
