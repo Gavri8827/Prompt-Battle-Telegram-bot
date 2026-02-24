@@ -18,15 +18,16 @@
 ## Instructions for Developers 
 ### Prerequisites
 - [uv](https://docs.astral.sh/uv/getting-started/installation/) (uv will also install Python for you!)
-- 🚧 ADD ANY OTHER PREREQUISITE HERE (MONGODB?)
 
 ### Setup
 - git clone this repository 
 - cd into the project directory
 - Get an API Token for a bot via the [BotFather](https://telegram.me/BotFather)
-- Create a `bot_secretes.py` file with your bot token:
+- Create a `.env` file with your secrets:
 
-      BOT_TOKEN = 'xxxxxxx'
+      BOT_TOKEN=your-telegram-bot-token
+      GROUP_LINK=https://t.me/your_group
+      API_BASE_URL=https://your-api-base-url
   
 ### Running the bot        
 - Run the bot (This will also install Python 3.13 and all dependencies):

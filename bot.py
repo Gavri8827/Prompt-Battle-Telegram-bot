@@ -1,7 +1,14 @@
-import logging
+"""
+Bot entry point — initializes the bot and starts polling.
+"""
 
-import bot_secrets
+import logging
+import sys
 import telebot
+import requests
+
+from config import BOT_TOKEN, HEALTH_CHECK_ENABLED, HEALTH_CHECK_URL
+from handlers import register_handlers
 
 logging.basicConfig(
     format="[%(levelname)s %(asctime)s %(module)s:%(lineno)d] %(message)s",
@@ -9,21 +16,18 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+bot = telebot.TeleBot(BOT_TOKEN)
 
-bot = telebot.TeleBot(bot_secrets.TOKEN)
+register_handlers(bot)
 
-
-@bot.message_handler(commands=["start"])
-def send_welcome(message: telebot.types.Message):
-    logger.info(f"+ Start chat #{message.chat.id} from {message.chat.username}")
-    bot.reply_to(message, "🤖 Welcome! 🤖")
-
-
-@bot.message_handler(func=lambda m: True)
-def echo_all(message: telebot.types.Message):
-    logger.info(f"[#{message.chat.id}.{message.message_id} {message.chat.username!r}] {message.text!r}")
-    bot.reply_to(message, f"You said: {message.text}")
-
+if HEALTH_CHECK_ENABLED:
+    try:
+        resp = requests.get(HEALTH_CHECK_URL, timeout=5)
+        resp.raise_for_status()
+        logger.info(f"Health check passed: {HEALTH_CHECK_URL}")
+    except Exception as e:
+        logger.error(f"Health check failed ({HEALTH_CHECK_URL}): {e}")
+        sys.exit(1)
 
 logger.info("> Starting bot")
 bot.infinity_polling()

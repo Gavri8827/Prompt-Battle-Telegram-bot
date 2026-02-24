@@ -1,4 +1,5 @@
-/bot_secrets.py
+
+.env
 
 *.pyc
 *.bak
@@ -15,6 +16,5 @@ Thumbs.db
 .vscode/
 .history/
 
-# Generally the lock file should be added, but this will save you pain in the Hackathon:
 uv.lock
 
