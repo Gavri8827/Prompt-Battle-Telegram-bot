@@ -3,15 +3,15 @@
 import base64
 import requests
 
-
 def fetch_challenge_image(api_url: str, timeout: int = 15):
     """
     Calls API1 and returns (image_bytes, image_id).
     Raises Exception if API fails.
     """
 
-    response = requests.post(api_url, timeout=timeout)
+    response = requests.get(api_url, timeout=timeout)
     response.raise_for_status()
+
 
     data = response.json()
 

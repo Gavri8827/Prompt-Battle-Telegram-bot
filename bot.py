@@ -124,7 +124,7 @@ def start_game(message):
     sent = bot.send_message(
         message.chat.id,
         "🎮 *New Game Starting!*\n\n"
-        "Time to join: 30s\n"
+        "Time to join: 15 s\n"
         "Players joined: 0",
         reply_markup=markup,
         parse_mode="Markdown",
@@ -160,12 +160,11 @@ def handle_join(call):
 # =============================
 # LOBBY COUNTDOWN (CLEAN)
 # =============================
-
 def lobby_countdown():
 
-    remaining = 30
+    remaining = 10
 
-    while remaining > 0:
+    while remaining >= 0:
 
         with game_lock:
             if game_state["status"] != "LOBBY":
@@ -191,14 +190,11 @@ def lobby_countdown():
             if "message is not modified" not in str(e):
                 logger.warning(f"Lobby edit error: {e}")
 
-        if remaining > 10:
-            sleep_time = 5
-            remaining -= 5
-        else:
-            sleep_time = 1
-            remaining -= 1
+        if remaining == 0:
+            break
 
-        time.sleep(sleep_time)
+        time.sleep(5)
+        remaining -= 5
 
     end_lobby()
 
@@ -221,7 +217,7 @@ def end_lobby():
         game_state["status"] = "GUESSING"
         game_state["guesses"] = {}
         game_state["waiting_for_guess"] = set()
-        game_state["guess_end_time"] = time.time() + 30
+        game_state["guess_end_time"] = time.time() + 15
 
     # Prepare deep link
     bot_username = bot.get_me().username
@@ -250,7 +246,7 @@ def end_lobby():
             group_id,
             photo=image_bytes,
             caption="🖼 *Describe this image!*\n\n"
-                    "You have 30 seconds.",
+                    "You have 15 seconds.",
             parse_mode="Markdown",
             reply_markup=markup,
         )
@@ -268,14 +264,13 @@ def end_lobby():
 # =============================
 # GUESS COUNTDOWN (CLEAN)
 # =============================
-
 def guess_countdown():
 
-    remaining = 30
+    remaining = 10
     bot_username = bot.get_me().username
     deep_link = f"https://t.me/{bot_username}?start=guess"
 
-    while remaining > 0:
+    while remaining >= 0:
 
         with game_lock:
             if game_state["status"] != "GUESSING":
@@ -286,7 +281,9 @@ def guess_countdown():
             guess_count = len(game_state["guesses"])
 
         markup = InlineKeyboardMarkup()
-        markup.add(InlineKeyboardButton("✍️ Submit Guess Privately", url=deep_link))
+        markup.add(
+            InlineKeyboardButton("✍️ Submit Guess Privately", url=deep_link)
+        )
 
         try:
             bot.edit_message_caption(
@@ -302,14 +299,11 @@ def guess_countdown():
             if "message is not modified" not in str(e):
                 logger.warning(f"Guess edit error: {e}")
 
-        if remaining > 10:
-            sleep_time = 5
-            remaining -= 5
-        else:
-            sleep_time = 1
-            remaining -= 1
+        if remaining == 0:
+            break
 
-        time.sleep(sleep_time)
+        time.sleep(5)
+        remaining -= 5
 
     end_guess_phase()
 

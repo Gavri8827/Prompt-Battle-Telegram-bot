@@ -2,8 +2,8 @@
 
 import base64
 import requests
-
-
+import bot_secrets
+import challenge_api
 def evaluate_prompt(api_url: str, image_id: str, prompt: str, timeout: int = 30):
     """
     Sends image_id + prompt to API2.
@@ -12,11 +12,11 @@ def evaluate_prompt(api_url: str, image_id: str, prompt: str, timeout: int = 30)
     """
 
     payload = {
-        "image_id": image_id,
-        "prompt": prompt,
+        "user_prompt": prompt,
+        "target_image_id": image_id,
     }
 
-    response = requests.post(api_url, json=payload, timeout=timeout)
+    response = requests.post(api_url, payload)
     response.raise_for_status()
 
     data = response.json()
@@ -32,4 +32,18 @@ def evaluate_prompt(api_url: str, image_id: str, prompt: str, timeout: int = 30)
 
     image_bytes = base64.b64decode(image_b64)
 
+
+
     return score, image_bytes
+
+
+# image_bytes, image_id2 = challenge_api.fetch_challenge_image(bot_secrets.API1_URL)
+# print(image_id2)
+# score, image_byte = evaluate_prompt(bot_secrets.API2_URL, image_id2, "dog with suit")
+#
+# print(score)
+# print("\n")
+# print(image_byte)
+
+
+
