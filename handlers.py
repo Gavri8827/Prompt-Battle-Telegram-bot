@@ -10,7 +10,7 @@ import threading
 
 import config
 from game_state import game_state, game_lock
-from game_logic import lobby_countdown
+from game_logic import lobby_countdown, evaluate_guess_async
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 logger = logging.getLogger(__name__)
@@ -46,8 +46,18 @@ def register_handlers(bot):
 
         bot.send_message(
             message.chat.id,
-            "🎮 *Welcome to the Image Guessing Game!*\n\n"
-            "Click below to join the official group.",
+            "🎮 *Welcome to Reverse Pictionary!*\n\n"
+            "🖼 An AI-generated image is shown in the group.\n"
+            "✍️ Your goal: describe it as accurately as you can!\n"
+            "🧠 The AI scores how close your prompt is to the original.\n"
+            "🏆 The best description wins!\n\n"
+            "*How to play:*\n"
+            "1️⃣ Join the group below\n"
+            "2️⃣ Someone starts a game with /start\\_game\n"
+            "3️⃣ Click *Join Game* in the group\n"
+            "4️⃣ When the image appears, DM me your best prompt\n"
+            "5️⃣ Results are revealed when the timer ends!\n\n"
+            "👇 *Join the group to get started:*",
             reply_markup=markup,
             parse_mode="Markdown",
         )
@@ -214,6 +224,9 @@ def register_handlers(bot):
             guess_count = len(game_state["guesses"])
 
         logger.info(f"Guess received from user {user_id}: \"{message.text}\" (total guesses: {guess_count})")
+
+        # Evaluate immediately in background
+        threading.Thread(target=evaluate_guess_async, args=(bot, user_id, message.text)).start()
 
         markup = InlineKeyboardMarkup()
         markup.add(InlineKeyboardButton("🔙 Return to Group", url=config.GROUP_LINK))

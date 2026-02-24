@@ -161,14 +161,44 @@ def guess_countdown(bot):
     end_guess_phase(bot)
 
 
+def evaluate_guess_async(bot, user_id, prompt):
+    """Evaluate a single guess in a background thread and store the result."""
+    with game_lock:
+        image_id = game_state.get("challenge_image_id")
+
+    logger.info(f"  Async evaluation started for user {user_id}: \"{prompt}\"")
+
+    try:
+        score, image_bytes = evaluate_prompt(
+            config.EVALUATE_API_URL, image_id, prompt
+        )
+        logger.info(f"  Async evaluation complete for user {user_id}: score={score}")
+
+        with game_lock:
+            game_state["evaluation_results"][user_id] = {
+                "score": score,
+                "image_bytes": image_bytes,
+            }
+            all_guessed = len(game_state["guesses"]) == len(game_state["players"])
+            all_evaluated = len(game_state["evaluation_results"]) == len(game_state["guesses"])
+            should_end_early = all_guessed and all_evaluated and game_state["status"] == "GUESSING"
+            if should_end_early:
+                game_state["status"] = "EVALUATING"  # Prevent countdown from also calling end_guess_phase
+
+        if should_end_early:
+            logger.info("All players submitted and evaluated — ending guess phase early")
+            end_guess_phase(bot)
+    except Exception as e:
+        logger.warning(f"  Async evaluation failed for user {user_id}: {e}")
+
+
 def end_guess_phase(bot):
-    """Evaluate all guesses and announce results."""
+    """Collect pre-evaluated results and announce them."""
     with game_lock:
         group_id = game_state["group_id"]
-        image_id = game_state.get("challenge_image_id")
         guesses_copy = dict(game_state["guesses"])
 
-    logger.info(f"Guess phase ended: {len(guesses_copy)} guesses received for image_id={image_id}")
+    logger.info(f"Guess phase ended: {len(guesses_copy)} guesses received")
 
     if not guesses_copy:
         logger.info("No guesses submitted, resetting game")
@@ -176,20 +206,28 @@ def end_guess_phase(bot):
         reset_game()
         return
 
-    logger.info(f"Evaluating {len(guesses_copy)} guesses...")
-    bot.send_message(group_id, "🧠 Evaluating guesses... Please wait.")
+    # Wait for any in-flight evaluations to finish (poll up to 10s)
+    bot.send_message(group_id, "🧠 Finalizing results... Please wait.")
+    waited = 0
+    while waited < 10:
+        with game_lock:
+            done_count = len(game_state["evaluation_results"])
+        if done_count >= len(guesses_copy):
+            break
+        logger.info(f"  Waiting for evaluations: {done_count}/{len(guesses_copy)} complete")
+        time.sleep(1)
+        waited += 1
+
+    # Collect results
+    with game_lock:
+        eval_results = dict(game_state["evaluation_results"])
+
+    logger.info(f"  {len(eval_results)}/{len(guesses_copy)} evaluations completed")
 
     results = []
-
     for user_id, prompt in guesses_copy.items():
-        logger.info(f"  Evaluating user {user_id}: \"{prompt}\"")
-        try:
-            score, image_bytes = evaluate_prompt(
-                config.EVALUATE_API_URL, image_id, prompt
-            )
-            logger.info(f"  User {user_id} scored {score}")
-        except Exception as e:
-            logger.warning(f"  Evaluation failed for user {user_id}: {e}")
+        if user_id not in eval_results:
+            logger.warning(f"  Skipping user {user_id}: evaluation not ready")
             continue
 
         try:
@@ -202,8 +240,8 @@ def end_guess_phase(bot):
             "user_id": user_id,
             "username": username,
             "prompt": prompt,
-            "score": score,
-            "image_bytes": image_bytes,
+            "score": eval_results[user_id]["score"],
+            "image_bytes": eval_results[user_id]["image_bytes"],
         })
 
     if not results:

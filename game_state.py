@@ -18,6 +18,7 @@ game_state = {
     "guess_end_time": None,
     "challenge_image_id": None,
     "lobby_end_time": None,
+    "evaluation_results": {},  # {user_id: {"score": ..., "image_bytes": ...}}
 }
 
 
@@ -34,6 +35,7 @@ def _reset_game_state():
         "guess_end_time": None,
         "challenge_image_id": None,
         "lobby_end_time": None,
+        "evaluation_results": {},
     })
 
 

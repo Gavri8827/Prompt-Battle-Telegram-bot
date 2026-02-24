@@ -27,9 +27,9 @@ EVALUATE_API_URL = f"{API_BASE_URL}/play_round"
 # GAME SETTINGS
 # =============================
 
-LOBBY_DURATION = 15       # Total lobby countdown in seconds
+LOBBY_DURATION = 10       # Total lobby countdown in seconds
 LOBBY_TICK = 5            # Lobby countdown update interval in seconds
-GUESS_DURATION = 40       # Total guess countdown in seconds
+GUESS_DURATION = 35       # Total guess countdown in seconds
 GUESS_TICK = 5            # Guess countdown update interval in seconds
 MIN_PLAYERS = 1           # Minimum players required to start a game
 
