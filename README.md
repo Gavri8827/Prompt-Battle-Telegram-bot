@@ -39,7 +39,7 @@ The **Reverse Pictionary Bot** challenges players to look at an AI-generated ima
 ## 🚀 Getting Started
 
 ### 🔗 Try the Bot
-Join the fun here: [t.me/YourBotLinkHere](https://t.me/+IVgUJhdx7gplN2Q0)
+Join the fun here: [Guess The Prompt](https://t.me/+IVgUJhdx7gplN2Q0)
 
 ---
 
@@ -51,5 +51,4 @@ Join the fun here: [t.me/YourBotLinkHere](https://t.me/+IVgUJhdx7gplN2Q0)
 ### ⚙️ Setup
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/your-repo/guess-the-prompt.git](https://github.com/your-repo/guess-the-prompt.git)
-   cd guess-the-prompt
+   uv run bot.py
