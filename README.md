@@ -39,7 +39,7 @@ The **Reverse Pictionary Bot** challenges players to look at an AI-generated ima
 ## 🚀 Getting Started
 
 ### 🔗 Try the Bot
-Join the fun here: [Guess The Prompt](https://t.me/+IVgUJhdx7gplN2Q0)
+Join the fun here: [Guess The Prompt](https://t.me/reverse_pictionary_bot)
 
 ---
 
