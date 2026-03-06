@@ -11,9 +11,25 @@
 ### 🎨 Reverse Pictionary Bot
 An interactive Telegram-based game where players compete to reverse-engineer AI images. Instead of drawing, players use their linguistic and descriptive skills to match the AI's original prompt using semantic similarity scoring.
 
+## 🖼️ Screenshots
 
+### Lobby & Game Start
+<img src="images/image1.png" width="300" height="300" alt="Lobby Screen">
+
+### Game in Progress
+<img src="images/image3.png" width="300" height="400" alt="Lobby Screen">
+
+### AI Generated Image Example
+<img src="images/image2.png" width="300" height="400" alt="Lobby Screen">
+
+### Player Submissions
+<img src="images/image4.png" width="300" height="400" alt="Lobby Screen">
+
+### Results & Similarity Scoring
+<img src="images/image5.png" width="300" height="300" alt="Lobby Screen">
 
 ---
+
 
 ## 📝 Game Mechanics
 
