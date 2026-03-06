@@ -1,4 +1,4 @@
-# 🤖 Guess The Prompt
+# 🤖 Prompt Battle
 
 ## 👥 The Team
 * 👨‍💻 **Nir Hazan**
